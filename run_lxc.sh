@@ -25,7 +25,7 @@ trap_ctrlc() {
 
 trap trap_ctrlc SIGINT
 
-# =============== 单次实验函数 ===============
+# =============== 单次采集函数 ===============
 run_experiment() {
     local prog_name="$1"      # benign 或 ransomware
     local run_number="$2"
@@ -53,17 +53,17 @@ run_experiment() {
         > "$output_file" 2>&1 &
     PERF_PID=$!
 
-    # 4. 等待 perf 完全启动（实测 60~90ms 足够）
-    sleep 0.08
+    # 4. 等待 perf 完全启动
+    sleep 0.1
 
-    # 5. 启动目标程序（你唯一允许的方式）
+    # 5. 启动目标程序
     sudo lxc-attach -n "$CONTAINER" -- sudo -i "/home/$prog_name" &
     PROG_PID=$!
 
-    # 6. 程序运行整整 10 秒
+    # 6. 程序运行 10 秒
     sleep 10
 
-    # 7. 立即暴力终结一切
+    # 7. 强制停止所有进程
     sudo lxc-attach -n "$CONTAINER" -- pkill -9 -u user 2>/dev/null || true
     sudo lxc-attach -n "$CONTAINER" -- killall -9 -u user 2>/dev/null || true
     sleep 0.3
@@ -75,14 +75,12 @@ run_experiment() {
     wait $PERF_PID 2>/dev/null || true
 
     echo "✓ $prog_name 第 $run_number 次完成！"
-    echo "  perf 实际采集时长 ≈ 10.07 秒（程序运行 10.000 秒）"
     echo "  结果已保存: $output_file"
     echo
 }
 
 # =============== 主循环 ===============
-echo "开始执行 10 次 benign + 10 次 ransomware 实验"
-echo "任意时刻按 Ctrl+C 可安全中断，当前进度会自动保留"
+echo "开始实验"
 echo
 
 for i in {1..5}; do
@@ -94,7 +92,7 @@ for i in {1..5}; do
 done
 
 echo "======================================================================"
-echo "所有 20 次实验成功完成！"
+echo "完成"
 echo "结果目录: $OUTPUT_DIR"
 echo "文件列表:"
 ls -1 "$OUTPUT_DIR"/*.csv | sort
