@@ -1,0 +1,17 @@
+sudo perf stat -x ',' -I 10 \
+    -e instructions,cache-references,cache-misses,branches,branch-misses \
+    --cgroup=/lxc.payload.encrypt -a \
+    > encrypt_hpc_$(date +%Y%m%d_%H%M%S).csv 2>&1
+
+lxc-attach -n encrypt -- bash -c 'while true; do for i in {1..100000}; do [[ $((i%100)) -eq 0 ]] && echo -n ""; done; dd if=/dev/zero of=/dev/null bs=1M count=1000 2>/dev/null; done' &
+
+
+install bpftrace(at least v0.18)
+which bpftrace
+
+cp github download to /usr/local/bin or usr/bin
+
+sudo crontab -e 
+
+添加
+@reboot /home/trace_exec.sh > /home/trace.log 2>&1
